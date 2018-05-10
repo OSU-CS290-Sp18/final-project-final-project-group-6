@@ -1,1 +1,3 @@
-"# final-project-final-project-group-6" 
+Final Project Group 6
+
+Will put more here later...
