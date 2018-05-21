@@ -1,0 +1,19 @@
+body{
+  max-width: 1000px;
+  margin:40px auto;
+
+  align-content: center;
+
+}
+
+#page-features{
+  text-align: center;
+}
+#title-text{
+  font-size: 100px;
+  text-align: center;
+}
+
+div {
+  background-color: lime;
+}
