@@ -8,30 +8,57 @@
     <link rel="stylesheet" href="style.css">
   </head>
 
-  <body>
-    <h1 id="title-text">recipe finder</h1>
+  <body id="mainpage-body">
+    <h1 id="title-text" class="site-title">Our site title</h1>
 
     <main>
-      <div id="search-bar">
-        <input type="text" id="search-input" placeholder="add an ingredient...">
+      <div id="main-search" class="search-bar">
+        <input type="text" class="search-input" placeholder="add an ingredient...">
       </div>
 
-      <div id="page-features">
+      <div id="mainpage-content">
         <div id="ingredients-container">
-          Ingredients go here
+
+          <article class="mainpage-ingredient">
+            <span class="ingredient-name">ingredient</span>
+            <div class="remove-ingredient-button">
+            </div>
+          </article>
+
+          <article class="mainpage-ingredient">
+            <span class="ingredient-name">ingredient with long name</span>
+            <div class="remove-ingredient-button">
+            </div>
+          </article>
+
+          <article class="mainpage-ingredient">
+            <span class="ingredient-name">shrt</span>
+            <div class="remove-ingredient-button">
+            </div>
+          </article>
+
+          <article class="mainpage-ingredient">
+            <span class="ingredient-name">cheese</span>
+            <div class="remove-ingredient-button">
+            </div>
+          </article>
+
+          <article class="mainpage-ingredient">
+            <span class="ingredient-name">ingredient</span>
+            <div class="remove-ingredient-button">
+            </div>
+          </article>
+
+          <article class="mainpage-ingredient">
+            <span class="ingredient-name">ingredient</span>
+            <div class="remove-ingredient-button">
+            </div>
+          </article>
+
         </div>
-        <button type = "button" id="increment-max-button"></button>
 
-        <button type = "decrement-max-button"></button>
-
-        <div id="num-ingredients-display">
-          #
-        </div>
-
-        <button type = "button" id="generate-recipes-button"></button>
+        <button type = "button" id="generate-recipes-button">generate</button>
       </div>
-
-
 
     </main>
   </body>

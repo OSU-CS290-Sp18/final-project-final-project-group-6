@@ -1,19 +1,62 @@
-body{
-  max-width: 1000px;
-  margin:40px auto;
-
-  align-content: center;
-
+#mainpage-body{
+  /* these two together ensure our page is nicely centered and not too wide*/
+  /*max-width: 1000px;*/
+  /*margin:40px auto;*/
 }
 
-#page-features{
-  text-align: center;
-}
-#title-text{
+.site-title{
   font-size: 100px;
   text-align: center;
 }
 
-div {
+#main-search{
+  text-align: center;
+}
+
+.search-input{
+  width: 700px;
+}
+#mainpage-content{
+  width: 800px;
+  margin: 0 auto;
   background-color: lime;
+}
+
+#ingredients-container{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin: 40px;
+}
+
+.mainpage-ingredient{
+  margin: 10px;
+  border-radius: 5px;
+  background-color: grey;
+}
+
+.ingredient-name{
+  font-size: 20px;
+  margin: 5px;
+}
+
+.remove-ingredient-button{
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  display: inline-block;
+}
+
+#num-ingredients-display{
+  width: 100px;
+  height: 100px;
+  display: inline;
+  background-color: orange;
+}
+
+#generate-recipes-button{
+  background-color: orange;
+  width: 780px;
+  margin: 10px;
+  height: 100px;
 }
