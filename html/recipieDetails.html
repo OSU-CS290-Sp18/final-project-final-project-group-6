@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<meta charset="utf-8">
+		<title>Recipie Finder</title>
+
+		<!-- include fonts here -->
+
+		<link rel="stylesheet" href="../style/style.css" media="screen">
+
+		<!-- include javascript/other scripts here -->
+
+	</head>
+
+	<body>
+		<header>
+			<h1 class="site-title">Our Site Title</h1>
+		</header>
+
+		<main>
+			<div class="recipie-box">
+				<h2 class="recipie-title">{{recipieTitle}}</h2>
+				<img src={{RecipieImageSource}}>
+				<div class="recipie-ingredients-content">
+					<div class="ingredients">
+						<h3 id="ingredient-title">Ingredients:</h3>
+						<ul>
+							<li>template this</li>
+						</ul>
+					</div>
+					<div class="prep-time">
+						<h3 id="prep-time-title">Prep, Time:</h3>
+						<h3 id="prep-time-value">{{prepTime}}</h3>
+					</div>
+				</div>
+				<div class="recipie-steps-content">
+					<div class="steps">
+						<h3 id="ingredient-title">Steps:</h3>
+						<ol type="1">
+							<li>template this too</li>
+						</ol>
+					</div>
+				</div>
+				<a href={{recipieSource}}>Recipie Source</a>
+			</div>
+		</main>
+
+	</body>
+</html>
