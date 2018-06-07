@@ -9,26 +9,51 @@ var mongoDBName = process.env.MONGO_DB;
 
 var mongoURL = 'mongodb://' + mongoUser + ':' + mongoPassword + '@' + mongoHost + ':' + mongoPort + '/' + mongoDBName; 
 var mongoDBDatabase;
-
-
+ 
 var app = express();
 var port = process.env.PORT || 3000; 
+ 
+var ingredientsArray; 
 
-console.log(mongoURL); 
-app.use(express.static('public')); 
+console.log("connected to DB: ", mongoURL); 
 
-app.get('/', function (req, res, next) {
+//logger, here for debugging
+app.use(function (req, res, next) {
+    console.log(req.method, " request made at: ", req.url);
+    next();
+});
+
+
+app.get('/search/:ingredient', function (req, res, next){
+    console.log("Ingredient searched: ", req.params.ingredient);
+  
+    //TODO 
+    //temporary, need to search all ingredients from all recipes
+    if(ingredientsArray[0].ingredients.indexOf(req.params.ingredient) != -1){
+          res.status(200).send(req.params.ingredient);
+    } else {
+       res.status(404);
+       next();
+    } 
+});
+
+//need to load database before anything else happens
+app.use('/home.html', function (req, res, next) {
     var recipes = mongoDBDatabase.collection('recipes');
-    var recipeCursor = recipes.find({}).project({'ingredients': 1}); 
+    var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0}); 
 
-    recipeCursor.toArray(function (err, recipeDocs) {
+    ingredientCursor.toArray(function (err, recipeDocs) {
         if(err){
             res.status(500).send("Error fetching from DB");
         } else {
-            console.log(recipeDocs);
-        }
+            ingredientsArray = recipeDocs;
+            next();
+       }
     });
+
 });
+
+app.use(express.static('public')); 
 
 MongoClient.connect(mongoURL, function (err, client) {
     if(err){
