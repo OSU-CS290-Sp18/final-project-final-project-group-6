@@ -11,13 +11,13 @@
       </ul>
     </div>
     <div class="prep-time">
-      <h3 id="prep-time-title">Prep Time:</h3>
-      <h3 id="prep-time-value">{{time}}</h3>
+      <h3 class="prep-time-title">Prep Time:</h3>
+      <h3 class="prep-time-value">{{time}}</h3>
     </div>
   </div>
   <div class="recipe-steps-content">
     <div class="directions">
-      <h3 id="directions-title">Directions:</h3>
+      <h3 class="directions-title">Directions:</h3>
       <ol type="1">
         {{#each directions}}
         <li>{{this}}</li>
@@ -25,5 +25,7 @@
       </ol>
     </div>
   </div>
-  <a href={{link}}>Recipe courtesy of {{courtesyOf}}</a>
+  <div class="specific-recipe-attribution">
+    <a href={{link}}>Recipe courtesy of {{courtesyOf}}</a>
+  </div>
 </div>
