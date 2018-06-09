@@ -84,3 +84,7 @@
 .prep-time {
   font-size: 25px;
 }
+
+.specific-recipe-attribution {
+  align-self: flex-start;
+}
