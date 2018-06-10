@@ -1,10 +1,15 @@
 
+
 body {
   font-family: 'Basic', sans-serif;
   margin: 0px;
   font-size 18px;
   background-color: #93B5C6;
 }
+
+/*TODO: make the page actually look good and fit with the website theme
+In particular: have a unified color scheme and fonts
+*/ 
 
 #mainpage-body{
   width: 100vw;

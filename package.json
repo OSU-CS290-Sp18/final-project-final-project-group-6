@@ -9,7 +9,7 @@
     "dev": "nodemon server.js",
     "build": "handlebars views/partials/ -f public/partials.js",
     "prestart": "npm run build",
-    "predev" : "npm run build"
+    "predev": "npm run build"
   },
   "repository": {
     "type": "git",
