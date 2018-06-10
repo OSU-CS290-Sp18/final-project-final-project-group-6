@@ -1,35 +1,81 @@
+
+body {
+  font-family: 'Basic', sans-serif;
+  margin: 0px;
+  font-size 18px;
+  background-color: #93B5C6;
+}
+
 #mainpage-body{
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .site-title{
   font-size: 100px;
+  font-family: 'Lilita One', cursive;
+  letter-spacing: 4px;
+  color: #CBE86D;
+  margin: 30px;
   text-align: center;
+  font-weight: normal;
+  text-shadow:
+    -3px -3px 0.2px #793345,
+    3px -3px 0.2px #793345,
+    -3px 3px 0.2px #793345,
+    3px 3px 0.2px #793345;
 }
 
+
+/****** Search bar **************************/
 #main-search{
+  border-radius: 5px;
+  padding: 0px;
+  border: 8px solid #793345;
+}
+.search-input{
+  font-size: 20px;
   text-align: center;
+  width: 100%;
+  margin: 0px;
+  padding: 5px 0px;
+  border: 0px;
 }
 
-.search-input{
-  width: 700px;
+.search-input::placeholder {
+  font-family: basic;
 }
+
+/*********************************************/
+
+
 #mainpage-content{
   width: 800px;
   margin: 0 auto;
-  background-color: lime;
+  background-color: #D7816A;
+  border: 8px solid #793345;
+  margin: 30px 0px;
+  border-radius: 5px;
+
 }
 
 #ingredients-container{
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  margin: 40px;
+  margin: 5px;
 }
 
 .mainpage-ingredient{
   margin: 10px;
   border-radius: 5px;
-  background-color: grey;
+  background-color: white;
+  border: 4px solid #793345;
+  padding: 5px;
 }
 
 .ingredient-name{
@@ -38,25 +84,36 @@
 }
 
 .remove-ingredient-button{
-  width: 10px;
-  height: 10px;
-  background-color: red;
+  height: 100%;
   display: inline-block;
+  color: #793345;
 }
 
 #num-ingredients-display{
   width: 100px;
   height: 100px;
   display: inline;
-  background-color: orange;
+  background-color: #CBE86D;
 }
 
 #generate-recipes-button{
-  background-color: orange;
+  background-color: #F7D76C;
+  /* This width is the determining factor for how wide the page looks */
   width: 780px;
   margin: 10px;
   height: 100px;
+  border: 4px solid #793345;
+  border-radius: 5px;
+  font-family: 'Lilita One', cursive;
+  letter-spacing: 0px;
+  font-size: 50px;
+  color: #793345;
 }
+
+
+/*
+ *  Here down is for individual recipe page
+ */
 
 .recipe-box {
   display: flex;
