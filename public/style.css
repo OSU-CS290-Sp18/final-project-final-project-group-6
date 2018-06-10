@@ -7,6 +7,14 @@ body {
   background-color: #93B5C6;
 }
 
+header {
+    background-color: #F7D76C;
+    margin: 0px;
+    padding: 1px;
+    border-bottom: 3px solid #793345;
+    margin-bottom: 20px;
+}
+
 /*TODO: make the page actually look good and fit with the website theme
 In particular: have a unified color scheme and fonts
 */
@@ -125,12 +133,13 @@ h1 {
  */
 
 .recipe-box {
+  width: 70%;
+  margin-left: 15%;
   display: flex;
-  padding: 5px 20px;
+  padding: 5px;
   align-items: center;
   flex-direction: column;
   background-color: #D7816A;
-  margin: 20px;
   border: 3px solid #793345;
   border-radius: 10px;
 }
@@ -174,6 +183,7 @@ h1 {
 .prep-time {
   margin: 10px;
   text-align: center;
+
   border-radius: 5px;
   background-color: #F7D76C;
   border: 4px solid #793345;
