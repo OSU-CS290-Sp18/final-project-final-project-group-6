@@ -45,18 +45,24 @@ searchInput.addEventListener('keyup', function(event){
   }
 });
 
+//Sends all of the user-entered ingredients to the server
+//Generates an array of the recipes on the server side
+//This array will be used to dynamically generate the recipes page
 function generateRecipes(){
   console.log("Num ingredients: ", ingredientNames.length);
 
+  //used in a GET request to send ingredient names to server
   var ingredientNamesString = "recipesWith/";
   for (var i = 0; i < ingredientNames.length - 1; i++){
     ingredientNamesString += ingredientNames[i].textContent + ",";
   }
 
+  //This is done to avoid the extra comma at the end
   ingredientNamesString += ingredientNames[ingredientNames.length - 1].textContent;
 
   console.log(ingredientNamesString);
 
+  //first send the ingredient names to the server
   var request = new XMLHttpRequest();
   request.open('GET', ingredientNamesString);
   request.send();
@@ -64,16 +70,18 @@ function generateRecipes(){
   request.onload = function (){
     console.log(request.status);
     if(request.status === 200){
+
+      //if ingredient names sent correctly, a list of recipes will be sent back
       var generatedRecipeNames = request.response;
 
+      //Finally, request a page of the generated Recipes 
       var requestRecipes = new XMLHttpRequest();
       requestRecipes.open('GET', "/genRecipe/" + generatedRecipeNames);
       requestRecipes.send();
+
+      //TODO: make this actually take the user to the genRecipe page
     }
   };
-
-
-
 }
 
 genButton.addEventListener('click', generateRecipes);
