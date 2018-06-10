@@ -1,0 +1,37 @@
+
+//from ingredients-containter in home.html
+<article class="mainpage-ingredient">
+  <span class="ingredient-name">ingredient</span>
+  <div class="remove-ingredient-button">
+  </div>
+</article>
+
+<article class="mainpage-ingredient">
+  <span class="ingredient-name">ingredientwithlongname</span>
+  <div class="remove-ingredient-button">
+  </div>
+</article>
+
+<article class="mainpage-ingredient">
+  <span class="ingredient-name">shrt</span>
+  <div class="remove-ingredient-button">
+  </div>
+</article>
+
+<article class="mainpage-ingredient">
+  <span class="ingredient-name">cheese</span>
+  <div class="remove-ingredient-button">
+  </div>
+</article>
+
+<article class="mainpage-ingredient">
+  <span class="ingredient-name">ingredient</span>
+  <div class="remove-ingredient-button">
+  </div>
+</article>
+
+<article class="mainpage-ingredient">
+  <span class="ingredient-name">ingredient</span>
+  <div class="remove-ingredient-button">
+  </div>
+</article>
