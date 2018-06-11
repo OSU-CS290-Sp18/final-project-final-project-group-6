@@ -1,4 +1,12 @@
+/*
+Server code for recipeFinder
+To use: set environment variables with the names below
 
+Author: Alex Grejuc
+*/ 
+
+//Ensure these dependencies are all installed in node_modules
+//These can be installed by running npm install (assuming you have the package.json from this repo) 
 var path = require('path');
 var express = require('express');
 var MongoClient = require('mongodb').MongoClient;
@@ -14,39 +22,29 @@ var mongoPassword = process.env.MONGO_PASSWORD;
 var mongoDBName = process.env.MONGO_DB;
 
 var mongoURL = 'mongodb://' + mongoUser + ':' + mongoPassword + '@' + mongoHost + ':' + mongoPort + '/' + mongoDBName;
-var mongoDBDatabase;
+var db; //the database 
 
 var app = express();
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3000; //use environment variable if set 
+
+var ingredientsArray = [];
+var recipes; //all of the recipes from the DB
+var generatedRecipes; //only the recipes that match the user-entered ingredients 
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
-var ingredientsArray = [];
-var recipes;
-var ingredientCursor;
-var idea;
+console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
 
-//var generatedRecipes;
-
-console.log("Attempting to connect to DB: ", mongoURL);
-
-//logger, here for debugging
-/*app.use(function (req, res, next) {
-    console.log(req.method, " request made at: ", req.url);
-    next();
-});*/
-
-
+//This is triggered when a user enters an ingredient on the main search bar
 app.get('/search/:ingredient', function (req, res, next){
-    console.log("Ingredient searched: ", req.params.ingredient);
+    console.log("\n=== Ingredient searched: ", req.params.ingredient, " ===");
 
     //Checks if the ingredient exists in the DB
     if(ingredientsArray.indexOf(req.params.ingredient) != -1){
-          res.status(200).send(req.params.ingredient);
+        res.status(200).send(req.params.ingredient);
     } else {
-       res.status(404);
-       next();
+       res.status(404).send();
     }
 });
 
@@ -55,84 +53,90 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
 
     //Turn the parameter string into an array of the ingredient names
     var ingredients = req.params.ingredients.split(',');
-    console.log("Searching for recipes with ingredient names: ", ingredients);
+    console.log("\n===Searching for recipes with ingredient names:\n", ingredients, "\n===");
 
     //Searches database to find any recipe that contains one or more of the ingredients entered by the user
-    var namesCursor = recipes.find({"ingredients": {$in: ingredients}}).project({"name" : 1, _id: 0});
+    var recipeCursor = recipes.find({"ingredients": {$in: ingredients}}).project({_id: 0});
 
     //namesCursor is a database object, this attempts to turn it into an array
-    namesCursor.toArray(function (err, nameDocs) {
+    recipeCursor.toArray(function (err, recipes) {
         if(err){
             res.status(500).send("Error fetching from DB");
-        } else {
-            //console.log(nameDocs);
+        } else {            
+            generatedRecipes = [];
+            var recipeScores = []; 
 
-            var generatedRecipes = []; //reset the array in case it has values in it for some reason (should not happen)
+            //This is quick and dirty
+            //Needs to be cleaned up and refactored
+            recipes.forEach(function (element) {
+                var score = 0; 
+                
+                element.ingredients.forEach(function (ingredient){ 
+                        if(ingredients.indexOf(ingredient) >= 0){ 
+                            score++;
+                        }
+                        else {
+                            score--; 
+                        } 
+                });
+                
+                recipeScores.push({"recipe": element, "score": score});
+            }); 
+            
+            recipeScores.sort(function(a, b){
+                if(a.score > b.score) return -1;
+                else if(b.score > a.score) return 1;
+                else return 0;
+            }); 
 
-            //store the recipes which match the user's ingredients in array for use later
-            for(var i = 0; i < nameDocs.length; i++){
-                generatedRecipes[i] = nameDocs[i].name;
+            console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
+            for(var i = 0; i < recipeScores.length && i < 10 ; i++){
+                generatedRecipes[i] = recipeScores[i].recipe;
             }
 
-            var generatedRecipeNamesString = "";
-
-            for(var i = 0; i < generatedRecipes.length - 1; i++){
-                generatedRecipeNamesString += generatedRecipes[i] + ",";
-            }
-
-            generatedRecipeNamesString += generatedRecipes[generatedRecipes.length - 1]
-
-
-            res.status(200).send(generatedRecipeNamesString);
-
+            console.log("\n=== Using the following (should be 10 or fewer) recipes:\n", generatedRecipes, "\n==="); 
+            
+            res.status(200).send(); //index.js listens for this and routes to genRecipe when received
        }
     });
 
 });
 
-//Monica's page
-app.get('/genRecipe/:recipeNames', function(req, res, next){
+//Automatically routes here after the recipes are generated
+//Routed via the javascript in index.js following a 200 response from the server 
+app.get('/genRecipe', function(req, res, next){
+  
+  //This is just for printing to the console
+  var names = ""; 
+ 
+  generatedRecipes.forEach(function(element){
+      names += element.name + ", "; 
+  });
+  names = names.slice(0, -2); //remove the last comma so it doesn't seem like a recipe is missing
 
-   //Monica you will need to use this info to generate your page dynamically
-    console.log("generated recipe names are: ", req.params.recipeNames);
-    //res.status(200).send(req.params.recipeNames);
-
-    var recipeNames = req.params.recipeNames.split(',');
-
-    //console.log(recipeNames);
-
-    //find full recipes for sent recipes
-    var selectedRecipes = recipes.find({"name": {$in: recipeNames}}).project({_id: 0});
-
-    //change to array for handlebars to use
-    selectedRecipes.toArray(function(err, recipesJSON) {
-      if(err){
-        res.status(500).send("Error fetching from database.");
-      } else { //render page with recipes in handlebars = selectedRecipes array
-        
-        console.log("bleh ", recipesJSON);
-
-        idea = recipesJSON;
-        console.log(idea);
-
-        res.status(200).send("okay");
-        }
-      });
+  console.log("\n=== Server generating genRecipe page with the following recipes:\n", names, "\n===");
+  res.status(200).render('genRecipe', {
+    recipes: generatedRecipes
+  });
 });
 
-app.get('/genRecipe', function(req, res, next){
-  console.log(idea);
-
-  console.log("here");
-  res.status(200).render('genRecipe', {
-    recipes: idea
-  });
+//This should render the recipe Details page
+//Monica you should route to this page from yours
+//You can do this either by sending a GET request from within your JS 
+//Or you can make every recipe a link to /recipeDetails/<name> with its corresponding name
+//Max you should set the inside of this function to render your page
+//recipeObject will contain a JSON object which can be used to render a page
+//(see Monica's example of that in the above middleware)
+app.get('/recipeDetails/:recipeName', function(req, res, next){
+    generatedRecipes.find(function(recipeObject) {
+        if(recipeObject.name == req.params.recipeName) console.log("\n=== Rendering recipe details with:\n", recipeObject, "\n===");
+    });
 });
 
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
-    recipes = mongoDBDatabase.collection('recipes');
-    ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
+    recipes = db.collection('recipes');
+    var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
 
     //Gets an array of all the ingredient names and stores it server side
     //This is all very hacky right now
@@ -140,9 +144,7 @@ app.use('/home.html', function (req, res, next) {
     ingredientCursor.toArray(function (err, recipeDocs) {
         if(err){
             res.status(500).send("Error fetching from DB");
-        } else {
-
-            console.log(recipeDocs[0].ingredients.length);
+        } else { 
             var index = 0;
             for(var i = 0; i < recipeDocs.length; i++){
                 for(var j = 0; j < recipeDocs[i].ingredients.length; j++){
@@ -151,7 +153,17 @@ app.use('/home.html', function (req, res, next) {
                 }
             }
 
-            console.log("All ingredients: ", ingredientsArray);
+            
+            ingredientsArray = ingredientsArray.sort();
+
+            //remove duplicates
+            //probably not efficient 
+            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
+                    return index === arr.indexOf(elem);
+            });
+
+
+            console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
             next();
        }
     });
@@ -161,15 +173,16 @@ app.use('/home.html', function (req, res, next) {
 app.use(express.static('public'));
 
 MongoClient.connect(mongoURL, function (err, client) {
-    if(err){
-        throw err;
-    }
-    db = mongoDBDatabase = client.db(mongoDBName);
+    if(err) throw err;
+
+    db = client.db(mongoDBName);
+    
     app.listen(port, function () {
-        console.log("server listening on port ", port, " (successfully connected to DB)");
+        console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
     });
 });
 
+//It would be nice to have an appropriately-styled 404 page, but it's not necessary 
 app.get('*', function (req, res) {
         res.status(404);
         res.send("The page you requested doesn't exist");
