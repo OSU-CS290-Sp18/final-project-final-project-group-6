@@ -63,7 +63,39 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
         if(err){
             res.status(500).send("Error fetching from DB");
         } else {            
-            generatedRecipes = recipes;
+            generatedRecipes = [];
+            var recipeScores = []; 
+
+            //This is quick and dirty
+            //Needs to be cleaned up and refactored
+            recipes.forEach(function (element) {
+                var score = 0; 
+                
+                element.ingredients.forEach(function (ingredient){ 
+                        if(ingredients.indexOf(ingredient) >= 0){ 
+                            score++;
+                        }
+                        else {
+                            score--; 
+                        } 
+                });
+                
+                recipeScores.push({"recipe": element, "score": score});
+            }); 
+            
+            recipeScores.sort(function(a, b){
+                if(a.score > b.score) return -1;
+                else if(b.score > a.score) return 1;
+                else return 0;
+            }); 
+
+            console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
+            for(var i = 0; i < recipeScores.length && i < 10 ; i++){
+                generatedRecipes[i] = recipeScores[i].recipe;
+            }
+
+            console.log("\n=== Using the following (should be 10 or fewer) recipes:\n", generatedRecipes, "\n==="); 
+            
             res.status(200).send(); //index.js listens for this and routes to genRecipe when received
        }
     });
@@ -120,6 +152,16 @@ app.use('/home.html', function (req, res, next) {
                     index += 1;
                 }
             }
+
+            
+            ingredientsArray = ingredientsArray.sort();
+
+            //remove duplicates
+            //probably not efficient 
+            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
+                    return index === arr.indexOf(elem);
+            });
+
 
             console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
             next();
