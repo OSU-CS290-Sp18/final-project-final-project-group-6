@@ -89,9 +89,9 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
     console.log("generated recipe names are: ", req.params.recipeNames);
     //res.status(200).send(req.params.recipeNames);
 
-    var recipeNames = req.params.recipeNames.split(','); 
+    var recipeNames = req.params.recipeNames.split(',');
 
-    //console.log(recipeNames); 
+    //console.log(recipeNames);
 
     //find full recipes for sent recipes
     var selectedRecipes = recipes.find({"name": {$in: recipeNames}}).project({_id: 0});
@@ -103,7 +103,7 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
       } else { //render page with recipes in handlebars = selectedRecipes array
         console.log(recipesJSON);
       }
-    })
+    });
 });
 
 //need to load database before anything else happens
