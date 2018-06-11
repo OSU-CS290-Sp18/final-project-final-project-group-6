@@ -129,6 +129,19 @@ app.get('/genRecipe', function(req, res, next){
   });
 });
 
+//This should render the recipe Details page
+//Monica you should route to this page from yours
+//You can do this either by sending a GET request from within your JS 
+//Or you can make every recipe a link to /recipeDetails/<name> with its corresponding name
+//Max you should set the inside of this function to render your page
+//recipeObject will contain a JSON object which can be used to render a page
+//(see Monica's example of that in the above middleware)
+app.get('/recipeDetails/:recipeName', function(req, res, next){
+    idea.find(function(recipeObject) {
+        if(recipeObject.name == req.params.recipeName) console.log("recipe details will use: ", recipeObject);
+    });
+});
+
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
     recipes = mongoDBDatabase.collection('recipes');
