@@ -1,5 +1,8 @@
+
+var path = require('path');
 var express = require('express');
 var MongoClient = require('mongodb').MongoClient;
+var exphbs = require('express-handlebars');
 
 //These are environment variables
 //The server will not start up properly if they are not set
@@ -16,9 +19,14 @@ var mongoDBDatabase;
 var app = express();
 var port = process.env.PORT || 3000;
 
+app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
+
 var ingredientsArray = [];
 var recipes;
 var ingredientCursor;
+var idea;
+
 //var generatedRecipes;
 
 console.log("Attempting to connect to DB: ", mongoURL);
@@ -89,9 +97,9 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
     console.log("generated recipe names are: ", req.params.recipeNames);
     //res.status(200).send(req.params.recipeNames);
 
-    var recipeNames = req.params.recipeNames.split(','); 
+    var recipeNames = req.params.recipeNames.split(',');
 
-    //console.log(recipeNames); 
+    //console.log(recipeNames);
 
     //find full recipes for sent recipes
     var selectedRecipes = recipes.find({"name": {$in: recipeNames}}).project({_id: 0});
@@ -101,10 +109,24 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
       if(err){
         res.status(500).send("Error fetching from database.");
       } else { //render page with recipes in handlebars = selectedRecipes array
-        console.log("will eventually render");
-      }
-    })
+        
+        console.log("bleh ", recipesJSON);
+
+        idea = recipesJSON;
+        console.log(idea);
+
+        res.status(200).send("okay");
+        }
+      });
 });
+
+app.get('/genRecipe', function(req, res, next){
+  console.log(idea);
+
+  console.log("here");
+  res.status(200).render('genRecipe', {
+    recipes: idea
+  });
 
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
