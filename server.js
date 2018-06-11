@@ -101,7 +101,7 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
       if(err){
         res.status(500).send("Error fetching from database.");
       } else { //render page with recipes in handlebars = selectedRecipes array
-        console.log(recipesJSON);
+        console.log("will eventually render");
       }
     })
 });
