@@ -127,6 +127,7 @@ app.get('/genRecipe', function(req, res, next){
   res.status(200).render('genRecipe', {
     recipes: idea
   });
+});
 
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
