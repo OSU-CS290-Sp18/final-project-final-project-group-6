@@ -21,7 +21,7 @@ var recipes;
 var ingredientCursor;
 //var generatedRecipes;
 
-console.log("connected to DB: ", mongoURL);
+console.log("Attempting to connect to DB: ", mongoURL);
 
 //logger, here for debugging
 /*app.use(function (req, res, next) {
@@ -87,19 +87,21 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
 
    //Monica you will need to use this info to generate your page dynamically
     console.log("generated recipe names are: ", req.params.recipeNames);
-    res.status(200).send(req.params.recipeNames);
+    //res.status(200).send(req.params.recipeNames);
+
+    var recipeNames = req.params.recipeNames.split(','); 
+
+    //console.log(recipeNames); 
 
     //find full recipes for sent recipes
-    var selectedRecipes = recipes.find({"name": {$in: recipeNames}});
+    var selectedRecipes = recipes.find({"name": {$in: recipeNames}}).project({_id: 0});
 
     //change to array for handlebars to use
-    selectedRecipes.toArray(function(err) {
+    selectedRecipes.toArray(function(err, recipesJSON) {
       if(err){
         res.status(500).send("Error fetching from database.");
       } else { //render page with recipes in handlebars = selectedRecipes array
-        res.status(200).render('genRecipes', {
-          recipes: selectedRecipes
-        })
+        console.log(recipesJSON);
       }
     })
 });
@@ -141,7 +143,7 @@ MongoClient.connect(mongoURL, function (err, client) {
     }
     db = mongoDBDatabase = client.db(mongoDBName);
     app.listen(port, function () {
-        console.log("server listening on port", port);
+        console.log("server listening on port ", port, " (successfully connected to DB)");
     });
 });
 
