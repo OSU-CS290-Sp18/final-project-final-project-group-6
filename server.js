@@ -109,6 +109,7 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
       if(err){
         res.status(500).send("Error fetching from database.");
       } else { //render page with recipes in handlebars = selectedRecipes array
+        
         console.log("bleh ", recipesJSON);
 
         idea = recipesJSON;
@@ -126,7 +127,6 @@ app.get('/genRecipe', function(req, res, next){
   res.status(200).render('genRecipe', {
     recipes: idea
   });
-});
 
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
