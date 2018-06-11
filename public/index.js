@@ -74,10 +74,20 @@ function generateRecipes(){
       //if ingredient names sent correctly, a list of recipes will be sent back
       var generatedRecipeNames = request.response;
 
-      //Finally, request a page of the generated Recipes 
+      //Finally, request a page of the generated Recipes
       var requestRecipes = new XMLHttpRequest();
       requestRecipes.open('GET', "/genRecipe/" + generatedRecipeNames);
       requestRecipes.send();
+
+      console.log("Seattle");
+      requestRecipes.onload = function() {
+        console.log("Italy");
+        if(requestRecipes.status === 200) {
+          console.log("Rome");
+          window.location.href = "/genRecipe";
+        }
+      }
+
 
       //TODO: make this actually take the user to the genRecipe page
     }

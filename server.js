@@ -25,6 +25,8 @@ app.set('view engine', 'handlebars');
 var ingredientsArray = [];
 var recipes;
 var ingredientCursor;
+var idea;
+
 //var generatedRecipes;
 
 console.log("Attempting to connect to DB: ", mongoURL);
@@ -107,9 +109,23 @@ app.get('/genRecipe/:recipeNames', function(req, res, next){
       if(err){
         res.status(500).send("Error fetching from database.");
       } else { //render page with recipes in handlebars = selectedRecipes array
-        console.log(recipesJSON);
-      }
-    })
+        console.log("bleh ", recipesJSON);
+
+        idea = recipesJSON;
+        console.log(idea);
+
+        res.status(200).send("okay");
+        }
+      });
+});
+
+app.get('/genRecipe', function(req, res, next){
+  console.log(idea);
+
+  console.log("here");
+  res.status(200).render('genRecipe', {
+    recipes: idea
+  });
 });
 
 //need to load database before anything else happens
