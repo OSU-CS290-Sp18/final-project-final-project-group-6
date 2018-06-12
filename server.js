@@ -1,9 +1,18 @@
-/*
-Server code for recipeFinder
-To use: set environment variables with the names below
-
-Author: Alex Grejuc
-*/
+/******************************************************************************
+** 
+** Server code for recipeFinder
+** 
+**          ** Must be on OSU VPN or OSU network to access MongoDB database **
+**
+**
+** To use: 
+**          set environment variables with the names below 
+**          run "npm install" to install necessary modules
+**          run "npm start" to run normally (also compiles handlebars)
+**          run "npm run dev" to run with nodemon (also compiles handlebars) 
+**
+**       
+******************************************************************************/
 
 //Ensure these dependencies are all installed in node_modules
 //These can be installed by running npm install (assuming you have the package.json from this repo)
@@ -27,8 +36,8 @@ var db; //the database
 var app = express();
 var port = process.env.PORT || 3000; //use environment variable if set
 
-var ingredientsArray = [];
-var recipes; //all of the recipes from the DB
+var ingredientsArray; 
+var recipesMongoObject; //all of the recipes from the DB
 var generatedRecipes; //only the recipes that match the user-entered ingredients
 var allRecipesArray;
 
@@ -36,6 +45,62 @@ app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
 console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
+
+// This will first attempt to connect to DB
+// Server eventually crashes if DB connection takes too long / does not work 
+MongoClient.connect(mongoURL, function (err, client) {
+    if(err) throw err;
+
+    db = client.db(mongoDBName);
+
+    //We only get to this point if there is no err
+    //Server will not start running w/o DB which is what we want 
+    app.listen(port, function () {
+        console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
+    });
+});
+
+//When user first loads the page this will create arrays of the recipes and ingredient 
+app.use("*", function (req, res, next) {
+
+    //If the truthiness of these variables is false, it means we have not initialized them
+    //This should only occur on the first use of the page 
+    if(!ingredientsArray || !recipesMongoObject || allRecipesArray){
+        recipesMongoObject = db.collection('recipes');
+
+        var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
+
+        ingredientsArray = []; 
+        recipesCursor.toArray(function(err, allRecipes){
+            if(err){
+                res.status(500).send("Error fetching from DB");
+            }
+            else{ //create array of all recipes, sorted set (i.e. no duplicates) of all ingredients 
+                            
+                allRecipesArray = allRecipes; 
+
+                //make an array of ingredients 
+                allRecipesArray.forEach(function (element){
+                    element.ingredients.forEach(function (ingredient){
+                        ingredientsArray.push(ingredient);
+                    });
+
+                });
+
+                ingredientsArray.sort();
+
+                //remove duplicates
+                //probably not efficient
+                ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
+                        return index === arr.indexOf(elem);
+                });
+
+
+                console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
+                next();
+            }});
+    }
+});
 
 //This is triggered when a user enters an ingredient on the main search bar
 app.get('/search/:ingredient', function (req, res, next){
@@ -49,6 +114,35 @@ app.get('/search/:ingredient', function (req, res, next){
     }
 });
 
+//really this should be in a separate module
+function scoreRecipes(recipeScores, ingredients, validRecipes){
+
+    //This is quick and dirty
+    //Needs to be cleaned up and refactored
+    validRecipes.forEach(function (element) {
+        var score = 0;
+
+        element.ingredients.forEach(function (ingredient){
+                if(ingredients.indexOf(ingredient) >= 0){
+                    score++;
+                }
+                else {
+                    score--;
+                }
+        });
+
+        recipeScores.push({"recipe": element, "score": score});
+    });
+
+    recipeScores.sort(function(a, b){
+        if(a.score > b.score) return -1;
+        else if(b.score > a.score) return 1;
+        else return 0;
+    });
+
+    console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
+}
+
 //Get request that is created when user clicks generate button on the main page
 app.get('/recipesWith/:ingredients', function (req, res, next){
 
@@ -57,42 +151,21 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
     console.log("\n===Searching for recipes with ingredient names:\n", ingredients, "\n===");
 
     //Searches database to find any recipe that contains one or more of the ingredients entered by the user
-    var recipeCursor = recipes.find({"ingredients": {$in: ingredients}}).project({_id: 0});
+    var recipeCursor = recipesMongoObject.find({"ingredients": {$in: ingredients}}).project({_id: 0});
 
     //namesCursor is a database object, this attempts to turn it into an array
-    recipeCursor.toArray(function (err, recipes) {
+    recipeCursor.toArray(function (err, validRecipes) {
         if(err){
             res.status(500).send("Error fetching from DB");
         } else {
 
 
             generatedRecipes = [];
+
             var recipeScores = [];
+            
+            scoreRecipes(recipeScores, ingredients, validRecipes); 
 
-            //This is quick and dirty
-            //Needs to be cleaned up and refactored
-            recipes.forEach(function (element) {
-                var score = 0;
-
-                element.ingredients.forEach(function (ingredient){
-                        if(ingredients.indexOf(ingredient) >= 0){
-                            score++;
-                        }
-                        else {
-                            score--;
-                        }
-                });
-
-                recipeScores.push({"recipe": element, "score": score});
-            });
-
-            recipeScores.sort(function(a, b){
-                if(a.score > b.score) return -1;
-                else if(b.score > a.score) return 1;
-                else return 0;
-            });
-
-            console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
             for(var i = 0; i < recipeScores.length && i < 10 ; i++){
                 generatedRecipes[i] = recipeScores[i].recipe;
             }
@@ -109,28 +182,30 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
 //Routed via the javascript in index.js following a 200 response from the server
 app.get('/genRecipe', function(req, res, next){
 
-  //This is just for printing to the console
-  var names = "";
+    //prevents undefined behavior if a user tries to bypass recipe generation to get to this page 
+    if(generatedRecipes){
+        //This is just for printing to the console
+        var names = "";
 
-  generatedRecipes.forEach(function(element){
-      names += element.name + ", ";
-  });
-  names = names.slice(0, -2); //remove the last comma so it doesn't seem like a recipe is missing
+        generatedRecipes.forEach(function(element){
+            names += element.name + ", ";
+        });
+        names = names.slice(0, -2); //remove the last comma so it doesn't seem like a recipe is missing
 
-  console.log("\n=== Server generating genRecipe page with the following recipes:\n", names, "\n===");
-  res.status(200).render('genRecipe', {
-    recipes: generatedRecipes
-  });
+        console.log("\n=== Server generating genRecipe page with the following recipes:\n", names, "\n===");
+        res.status(200).render('genRecipe', {
+            recipes: generatedRecipes
+        });
+    }
+    else next();
 });
 
-//This should render the recipe Details page
-//Monica you should route to this page from yours
-//You can do this either by sending a GET request from within your JS
-//Or you can make every recipe a link to /recipeDetails/<name> with its corresponding name
-//Max you should set the inside of this function to render your page
-//recipeObject will contain a JavaScript object which can be used to render a page
-//(see Monica's example of that in the above middleware)
+//This will render the recipe details page
+//Can either route here by clicking on a recipe tile on the genRecipe page
+//Or by directly entering the URL
 app.get('/recipeDetails/:recipeName', function(req, res, next){
+
+    var found = 0; 
 
     allRecipesArray.find(function(recipeObject) {
         if(recipeObject.name == req.params.recipeName) {
@@ -144,71 +219,17 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
                 link: recipeObject.link,
                 courtesyOf: recipeObject.courtesyOf
             });
+
+           found = 1;  
         }
 
     });
-    // res.status(200).send();
+     
+    if(!found) next(); 
 });
 
-//need to load database before anything else happens
-app.use('/home.html', function (req, res, next) {
-    recipes = db.collection('recipes');
-
-    var recipesCursor = recipes.find({}).project({_id: 0});
-
-    recipesCursor.toArray(function(err, allRecipes){
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        }else{
-            allRecipesArray = allRecipes;
-            //console.log("*** All recipes \n", allRecipesArray);
-        }});
-
-    var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
-
-    //Gets an array of all the ingredient names and stores it server side
-    //This is all very hacky right now
-    //I'm sure there is a better way to do it
-    ingredientCursor.toArray(function (err, recipeDocs) {
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        } else {
-            var index = 0;
-            for(var i = 0; i < recipeDocs.length; i++){
-                for(var j = 0; j < recipeDocs[i].ingredients.length; j++){
-                    ingredientsArray[index] = (recipeDocs[i].ingredients)[j];
-                    index += 1;
-                }
-            }
-
-
-            ingredientsArray = ingredientsArray.sort();
-
-            //remove duplicates
-            //probably not efficient
-            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
-                    return index === arr.indexOf(elem);
-            });
-
-
-            console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
-            next();
-       }
-    });
-
-});
 
 app.use(express.static('public'));
-
-MongoClient.connect(mongoURL, function (err, client) {
-    if(err) throw err;
-
-    db = client.db(mongoDBName);
-
-    app.listen(port, function () {
-        console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
-    });
-});
 
 //It would be nice to have an appropriately-styled 404 page, but it's not necessary
 app.get('*', function (req, res) {
