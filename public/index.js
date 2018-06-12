@@ -5,7 +5,7 @@ var ingredientNames = document.getElementsByClassName("ingredient-name");
 
 //sends user search query to database, adds to ingredients-container if successful
 function searchAddIngredient(){
-  var query = searchInput.value.toLowerCase();
+  var query = searchInput.value;
   var query_URL = "/search/" + query;
 
   console.log(query_URL);
