@@ -1,22 +1,19 @@
-
-
 <header>
-
   <h1 class="site-title">Generated Recipes</h1>
 
   <nav class="navbar">
     <ul class="navlist">
       <li class="navitem ingredient">
-        <button type="button" class="ingredient-x-button">X</button>IngredientName
+        <button type="button" class="remove-ingredient-button">✖</button>
+        <span class="ingredient-name">IngredientName</span>
       </li>
       <li class="navitem navbar-search">
         <input type="text" id="navbar-search-input" placeholder="Add Ingredient">
-        <button type="button" id="navbar-search-button"><i class="fas fa-search"></i></button>
+        <button type="button" id="navbar-search-button">+</i></button>
       </li>
     </ul>
   </nav>
 </header>
-
 
 <main class="recipe-container">
   {{#each recipes}}
