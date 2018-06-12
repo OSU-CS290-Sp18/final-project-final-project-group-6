@@ -131,7 +131,12 @@ app.get('/genRecipe', function(req, res, next){
 //recipeObject will contain a JavaScript object which can be used to render a page
 //(see Monica's example of that in the above middleware)
 app.get('/recipeDetails/:recipeName', function(req, res, next){
+<<<<<<< HEAD
     allRecipesArray.find(function(recipeObject) {
+=======
+    console.log("idk");
+    generatedRecipes.find(function(recipeObject) {
+>>>>>>> recipeRoute
         if(recipeObject.name == req.params.recipeName) {
             console.log("\n=== Rendering recipe details with:\n", recipeObject, "\n===");
             res.status(200).render('fullRecipePage', {
@@ -146,6 +151,7 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
         }
 
     });
+    // res.status(200).send();
 });
 
 //need to load database before anything else happens
