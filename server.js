@@ -164,11 +164,11 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
             
             scoreRecipes(recipeScores, ingredients, validRecipes); 
 
-            for(var i = 0; i < recipeScores.length && i < 10 ; i++){
+            for(var i = 0; i < recipeScores.length && i < 12 ; i++){
                 generatedRecipes[i] = recipeScores[i].recipe;
             }
 
-            console.log("\n=== Using the following (should be 10 or fewer) recipes:\n", generatedRecipes, "\n===");
+            console.log("\n=== Using the following (should be 12 or fewer) recipes:\n", generatedRecipes, "\n===");
 
             res.status(200).send(); //index.js listens for this and routes to genRecipe when received
        }
