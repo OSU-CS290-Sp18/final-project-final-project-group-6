@@ -36,7 +36,7 @@ var db; //the database
 var app = express();
 var port = process.env.PORT || 3000; //use environment variable if set
 
-var ingredientsArray = [];
+var ingredientsArray; 
 var recipesMongoObject; //all of the recipes from the DB
 var generatedRecipes; //only the recipes that match the user-entered ingredients
 var allRecipesArray;
@@ -60,41 +60,46 @@ MongoClient.connect(mongoURL, function (err, client) {
     });
 });
 
-//When user first loads the page this will create arrays of the recipes and ingredients 
-app.use('/home.html', function (req, res, next) {
-    recipesMongoObject = db.collection('recipes');
+//When user first loads the page this will create arrays of the recipes and ingredient 
+app.use("*", function (req, res, next) {
 
-    var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
+    //If the truthiness of these variables is false, it means we have not initialized them
+    //This should only occur on the first use of the page 
+    if(!ingredientsArray || !recipesMongoObject || allRecipesArray){
+        recipesMongoObject = db.collection('recipes');
 
-    recipesCursor.toArray(function(err, allRecipes){
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        }
-        else{
-            
-            allRecipesArray = allRecipes; 
+        var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
 
-            //make an array of ingredients 
-            allRecipesArray.forEach(function (element){
-                element.ingredients.forEach(function (ingredient){
-                    ingredientsArray.push(ingredient);
+        ingredientsArray = []; 
+        recipesCursor.toArray(function(err, allRecipes){
+            if(err){
+                res.status(500).send("Error fetching from DB");
+            }
+            else{ //create array of all recipes, sorted set (i.e. no duplicates) of all ingredients 
+                            
+                allRecipesArray = allRecipes; 
+
+                //make an array of ingredients 
+                allRecipesArray.forEach(function (element){
+                    element.ingredients.forEach(function (ingredient){
+                        ingredientsArray.push(ingredient);
+                    });
+
                 });
 
-             });
+                ingredientsArray.sort();
 
-            ingredientsArray.sort();
-
-            //remove duplicates
-            //probably not efficient
-            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
-                    return index === arr.indexOf(elem);
-            });
+                //remove duplicates
+                //probably not efficient
+                ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
+                        return index === arr.indexOf(elem);
+                });
 
 
-            console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
-            next();
-        }});
-
+                console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
+                next();
+            }});
+    }
 });
 
 //This is triggered when a user enters an ingredient on the main search bar
@@ -110,33 +115,32 @@ app.get('/search/:ingredient', function (req, res, next){
 });
 
 //really this should be in a separate module
-function scoreRecipes(recipeScores, ingredients){
-            //var recipeScores = [];
+function scoreRecipes(recipeScores, ingredients, validRecipes){
 
-            //This is quick and dirty
-            //Needs to be cleaned up and refactored
-            allRecipesArray.forEach(function (element) {
-                var score = 0;
+    //This is quick and dirty
+    //Needs to be cleaned up and refactored
+    validRecipes.forEach(function (element) {
+        var score = 0;
 
-                element.ingredients.forEach(function (ingredient){
-                        if(ingredients.indexOf(ingredient) >= 0){
-                            score++;
-                        }
-                        else {
-                            score--;
-                        }
-                });
+        element.ingredients.forEach(function (ingredient){
+                if(ingredients.indexOf(ingredient) >= 0){
+                    score++;
+                }
+                else {
+                    score--;
+                }
+        });
 
-                recipeScores.push({"recipe": element, "score": score});
-            });
+        recipeScores.push({"recipe": element, "score": score});
+    });
 
-            recipeScores.sort(function(a, b){
-                if(a.score > b.score) return -1;
-                else if(b.score > a.score) return 1;
-                else return 0;
-            });
+    recipeScores.sort(function(a, b){
+        if(a.score > b.score) return -1;
+        else if(b.score > a.score) return 1;
+        else return 0;
+    });
 
-            console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
+    console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
 }
 
 //Get request that is created when user clicks generate button on the main page
@@ -150,7 +154,7 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
     var recipeCursor = recipesMongoObject.find({"ingredients": {$in: ingredients}}).project({_id: 0});
 
     //namesCursor is a database object, this attempts to turn it into an array
-    recipeCursor.toArray(function (err, recipes) {
+    recipeCursor.toArray(function (err, validRecipes) {
         if(err){
             res.status(500).send("Error fetching from DB");
         } else {
@@ -159,7 +163,8 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
             generatedRecipes = [];
 
             var recipeScores = [];
-            scoreRecipes(recipeScores, ingredients); 
+            
+            scoreRecipes(recipeScores, ingredients, validRecipes); 
 
             for(var i = 0; i < recipeScores.length && i < 10 ; i++){
                 generatedRecipes[i] = recipeScores[i].recipe;
@@ -177,18 +182,22 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
 //Routed via the javascript in index.js following a 200 response from the server
 app.get('/genRecipe', function(req, res, next){
 
-  //This is just for printing to the console
-  var names = "";
+    //prevents undefined behavior if a user tries to bypass recipe generation to get to this page 
+    if(generatedRecipes){
+        //This is just for printing to the console
+        var names = "";
 
-  generatedRecipes.forEach(function(element){
-      names += element.name + ", ";
-  });
-  names = names.slice(0, -2); //remove the last comma so it doesn't seem like a recipe is missing
+        generatedRecipes.forEach(function(element){
+            names += element.name + ", ";
+        });
+        names = names.slice(0, -2); //remove the last comma so it doesn't seem like a recipe is missing
 
-  console.log("\n=== Server generating genRecipe page with the following recipes:\n", names, "\n===");
-  res.status(200).render('genRecipe', {
-    recipes: generatedRecipes
-  });
+        console.log("\n=== Server generating genRecipe page with the following recipes:\n", names, "\n===");
+        res.status(200).render('genRecipe', {
+            recipes: generatedRecipes
+        });
+    }
+    else next();
 });
 
 //This will render the recipe details page
