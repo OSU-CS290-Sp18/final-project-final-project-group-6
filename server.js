@@ -138,7 +138,7 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
             res.status(200).render('fullRecipePage', {
                 name: recipeObject.name,
                 photoURL: recipeObject.photoURL,
-                ingredients: recipeObject.ingredients,
+                ingredientsLong: recipeObject.ingredientsLong,
                 time: recipeObject.time,
                 directions: recipeObject.directions,
                 link: recipeObject.link,
