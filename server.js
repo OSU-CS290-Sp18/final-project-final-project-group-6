@@ -60,7 +60,7 @@ MongoClient.connect(mongoURL, function (err, client) {
     });
 });
 
-//need to load database before anything else happens
+//When user first loads the page this will create arrays of the recipes and ingredients 
 app.use('/home.html', function (req, res, next) {
     recipesMongoObject = db.collection('recipes');
 
@@ -69,30 +69,20 @@ app.use('/home.html', function (req, res, next) {
     recipesCursor.toArray(function(err, allRecipes){
         if(err){
             res.status(500).send("Error fetching from DB");
-        }else{
-            allRecipesArray = allRecipes;
-            //console.log("*** All recipes \n", allRecipesArray);
-        }});
+        }
+        else{
+            
+            allRecipesArray = allRecipes; 
 
-    var ingredientCursor = recipesMongoObject.find({}).project({'ingredients': 1, _id: 0});
+            //make an array of ingredients 
+            allRecipesArray.forEach(function (element){
+                element.ingredients.forEach(function (ingredient){
+                    ingredientsArray.push(ingredient);
+                });
 
-    //Gets an array of all the ingredient names and stores it server side
-    //This is all very hacky right now
-    //I'm sure there is a better way to do it
-    ingredientCursor.toArray(function (err, recipeDocs) {
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        } else {
-            var index = 0;
-            for(var i = 0; i < recipeDocs.length; i++){
-                for(var j = 0; j < recipeDocs[i].ingredients.length; j++){
-                    ingredientsArray[index] = (recipeDocs[i].ingredients)[j];
-                    index += 1;
-                }
-            }
+             });
 
-
-            ingredientsArray = ingredientsArray.sort();
+            ingredientsArray.sort();
 
             //remove duplicates
             //probably not efficient
@@ -102,11 +92,8 @@ app.use('/home.html', function (req, res, next) {
 
 
             console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
-            console.log("type of recipes: ", typeof recipesMongoObject);
-            console.log(recipesMongoObject); 
             next();
-       }
-    });
+        }});
 
 });
 
