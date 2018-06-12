@@ -31,9 +31,33 @@ function addIngredient(name){
   });
 
   var ingredientsContainer = document.querySelector('#ingredients-container');
+  
   ingredientsContainer.insertAdjacentHTML('beforeend', ingredientHTML);
+  
+  //adds delete listener to X 
+  var xbutton = ingredientsContainer.getElementsByClassName("remove-ingredient-button");
+  var xl = xbutton.length;
+  xbutton[xl - 1].addEventListener('click', function(){removeIngredient(name);});
+  
 }
 
+//finds and removes ingredient tag
+function removeIngredient(name)
+{
+	var tags = document.getElementsByClassName("mainpage-ingredient");
+	var l = tags.length;
+	var i;
+	for (i = 0; i < l; i++)
+	{
+		var iname = tags[i].getElementsByClassName("ingredient-name")[0].innerHTML;
+
+		if (iname === name)
+		{
+			var rItem = document.getElementsByClassName("mainpage-ingredient")[i];
+			document.getElementById("ingredients-container").removeChild(rItem);
+		}
+	}
+}
 //listens for enter key press on search
 searchInput.addEventListener('keyup', function(event){
   event.preventDefault(); //do nothing unless enter was pressed
