@@ -1,21 +1,25 @@
 <div class="recipe-box">
   <h2 class="recipe-title">{{name}}</h2>
-  <img src={{photoURL}}>
-  <div class="recipe-ingredients-content">
-    <div class="ingredients">
-      <h3 id="ingredient-title">Ingredients:</h3>
-      <ul>
-        {{#each ingredients}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ul>
-    </div>
-    <div class="prep-time">
-      <div class="prep-time-title">Prep Time:</div>
-      <div class="prep-time-value">{{time}}</div>
-    </div>
+
+  <div class="recipe-details-img">
+    <img src={{photoURL}}>
   </div>
-  <div class="recipe-steps-content">
+
+  <div class="recipe-detail-contents">
+    <div class="ingreds-and-time">
+      <div class="ingredients">
+        <h3 class="ingredient-title">Ingredients:</h3>
+        <ul>
+          {{#each ingredients}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      <div class="prep-time">
+        <div class="prep-time-title">Prep Time:</div>
+        <div class="prep-time-value">{{time}}</div>
+      </div>
+    </div>
     <div class="directions">
       <h3 class="directions-title">Directions:</h3>
       <ol type="1">
@@ -25,6 +29,7 @@
       </ol>
     </div>
   </div>
+
   <div class="specific-recipe-attribution">
     <a href={{link}}>Recipe courtesy of {{courtesyOf}}</a>
   </div>
