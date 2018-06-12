@@ -236,6 +236,7 @@ In particular: have a unified color scheme and fonts
   align-items: stretch;
   justify-content: space-between;
   margin: 10px;
+  flex: 1 1 0;
 }
 
 .ingredients {
@@ -243,7 +244,6 @@ In particular: have a unified color scheme and fonts
   background-color: #a0d9f5;
   border: 4px solid #793345;
   padding: 10px;
-  white-space: nowrap;
 }
 
 .directions {
@@ -252,6 +252,7 @@ In particular: have a unified color scheme and fonts
   background-color: white;
   border: 4px solid #793345;
   padding: 10px;
+  flex: 1.5 1 0;
 }
 
 .prep-time {
