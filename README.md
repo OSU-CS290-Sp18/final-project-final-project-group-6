@@ -15,5 +15,6 @@ Finally, clicking on a recipe tile on the generated recipes page takes the user 
 :sushi:           <br> 
 :bread:           <br> 
 :hamburger:       <br>
+
 [1] The closesness factor is determined by two things: the number of ingredients in the recipe which match what the user entered (1 point is added) and the number of extra ingredients in the recipe which the user did not enter (1 point is subtracted). 
 
