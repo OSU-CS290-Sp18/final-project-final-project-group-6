@@ -30,7 +30,7 @@ var port = process.env.PORT || 3000; //use environment variable if set
 var ingredientsArray = [];
 var recipes; //all of the recipes from the DB
 var generatedRecipes; //only the recipes that match the user-entered ingredients
-var allRecipesArray; 
+var allRecipesArray;
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
@@ -131,12 +131,8 @@ app.get('/genRecipe', function(req, res, next){
 //recipeObject will contain a JavaScript object which can be used to render a page
 //(see Monica's example of that in the above middleware)
 app.get('/recipeDetails/:recipeName', function(req, res, next){
-<<<<<<< HEAD
+
     allRecipesArray.find(function(recipeObject) {
-=======
-    console.log("idk");
-    generatedRecipes.find(function(recipeObject) {
->>>>>>> recipeRoute
         if(recipeObject.name == req.params.recipeName) {
             console.log("\n=== Rendering recipe details with:\n", recipeObject, "\n===");
             res.status(200).render('fullRecipePage', {
@@ -157,15 +153,15 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
     recipes = db.collection('recipes');
-    
+
     var recipesCursor = recipes.find({}).project({_id: 0});
 
     recipesCursor.toArray(function(err, allRecipes){
         if(err){
-            res.status(500).send("Error fetching from DB");         
+            res.status(500).send("Error fetching from DB");
         }else{
             allRecipesArray = allRecipes;
-            //console.log("*** All recipes \n", allRecipesArray); 
+            //console.log("*** All recipes \n", allRecipesArray);
         }});
 
     var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
