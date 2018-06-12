@@ -128,22 +128,21 @@ app.get('/genRecipe', function(req, res, next){
 //recipeObject will contain a JavaScript object which can be used to render a page
 //(see Monica's example of that in the above middleware)
 app.get('/recipeDetails/:recipeName', function(req, res, next){
-    var theRecipe = generatedRecipes.find(function(recipeObject) {
+    generatedRecipes.find(function(recipeObject) {
         if(recipeObject.name == req.params.recipeName) {
             console.log("\n=== Rendering recipe details with:\n", recipeObject, "\n===");
-            return true;
-        };
-    });
-    res.status(200).render('fullRecipePage', {
-        name: theRecipe.name,
-        photoURL: theRecipe.photoURL,
-        ingredients: theRecipe.ingredients,
-        time: theRecipe.time,
-        directions: theRecipe.directions,
-        link: theRecipe.link,
-        courtesyOf: theRecipe.courtesyOf
-    });
+            res.status(200).render('fullRecipePage', {
+                name: recipeObject.name,
+                photoURL: recipeObject.photoURL,
+                ingredients: recipeObject.ingredients,
+                time: recipeObject.time,
+                directions: recipeObject.directions,
+                link: recipeObject.link,
+                courtesyOf: recipeObject.courtesyOf
+            });
+        }
 
+    });
 });
 
 //need to load database before anything else happens
