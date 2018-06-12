@@ -8,7 +8,6 @@ Then, by clicking generate, they will be redirected to a new page which has up t
 
 Finally, clicking on a recipe tile on the generated recipes page takes the user to a third page which displays all of the details of the recipe (including attribution).
 
-<br>
 :spaghetti:       <br>
 :pizza:           <br>
 :ramen:           <br> 
