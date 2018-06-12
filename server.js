@@ -37,15 +37,13 @@ var app = express();
 var port = process.env.PORT || 3000; //use environment variable if set
 
 var ingredientsArray = [];
-var recipes; //all of the recipes from the DB
+var recipesMongoObject; //all of the recipes from the DB
 var generatedRecipes; //only the recipes that match the user-entered ingredients
 var allRecipesArray;
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
-
-// *** Start of routing *** 
 console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
 
 // This will first attempt to connect to DB
@@ -64,9 +62,9 @@ MongoClient.connect(mongoURL, function (err, client) {
 
 //need to load database before anything else happens
 app.use('/home.html', function (req, res, next) {
-    recipes = db.collection('recipes');
+    recipesMongoObject = db.collection('recipes');
 
-    var recipesCursor = recipes.find({}).project({_id: 0});
+    var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
 
     recipesCursor.toArray(function(err, allRecipes){
         if(err){
@@ -76,7 +74,7 @@ app.use('/home.html', function (req, res, next) {
             //console.log("*** All recipes \n", allRecipesArray);
         }});
 
-    var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
+    var ingredientCursor = recipesMongoObject.find({}).project({'ingredients': 1, _id: 0});
 
     //Gets an array of all the ingredient names and stores it server side
     //This is all very hacky right now
@@ -104,6 +102,8 @@ app.use('/home.html', function (req, res, next) {
 
 
             console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
+            console.log("type of recipes: ", typeof recipesMongoObject);
+            console.log(recipesMongoObject); 
             next();
        }
     });
@@ -130,7 +130,7 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
     console.log("\n===Searching for recipes with ingredient names:\n", ingredients, "\n===");
 
     //Searches database to find any recipe that contains one or more of the ingredients entered by the user
-    var recipeCursor = recipes.find({"ingredients": {$in: ingredients}}).project({_id: 0});
+    var recipeCursor = recipesMongoObject.find({"ingredients": {$in: ingredients}}).project({_id: 0});
 
     //namesCursor is a database object, this attempts to turn it into an array
     recipeCursor.toArray(function (err, recipes) {
