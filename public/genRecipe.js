@@ -15,3 +15,32 @@
 //
 //   recipeContainer.insertAdjacentHTML('beforeend', newRecipeHTML);
 // }
+
+function renderDetails(event){
+  var container = event.target;
+  var text = container.querySelector('.recipe-name').innerText;
+    console.log("Chosen Recipe: ", text);
+
+  if(text) {
+    console.log("here");
+    var recipeURL = "recipeDetails/" + text;
+
+    window.location.href = recipeURL;
+
+
+
+    // request.onload = function(){
+    //   console.log(request.status);
+    //   if(request.status === 200){
+    //     window.location.href = recipeURL;
+      // }
+    // }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  var recipeContainer = document.getElementsByClassName('recipe-text');
+  for(var i = 0; i < recipeContainer.length; i++) {
+    recipeContainer[i].addEventListener('click', renderDetails);
+  }
+});

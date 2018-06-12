@@ -38,7 +38,7 @@ templates['recipe'] = template({"compiler":[7,">= 4.0.0"],"main":function(contai
     + "\r\n    </p>\r\n    <p class=\"recipe-time\">\r\n      "
     + alias4(((helper = (helper = helpers.time || (depth0 != null ? depth0.time : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"time","hash":{},"data":data}) : helper)))
     + "\r\n    </p>\r\n  </div>\r\n  <div class=\"recipe-img\">\r\n    <img src = "
-    + alias4(((helper = (helper = helpers.photURL || (depth0 != null ? depth0.photURL : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"photURL","hash":{},"data":data}) : helper)))
+    + alias4(((helper = (helper = helpers.photoURL || (depth0 != null ? depth0.photoURL : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"photoURL","hash":{},"data":data}) : helper)))
     + ">\r\n  </div>\r\n</article>\r\n";
 },"useData":true});
 })();
