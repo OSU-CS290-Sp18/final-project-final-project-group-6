@@ -1,4 +1,4 @@
 *.log
 *.swp
 node_modules
-views/partials
+public/partials.js
