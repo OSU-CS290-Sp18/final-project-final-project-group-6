@@ -36,10 +36,13 @@ var db; //the database
 var app = express();
 var port = process.env.PORT || 3000; //use environment variable if set
 
-var ingredientsArray; 
-var recipesMongoObject; //all of the recipes from the DB
+//These are populated on when the server is first started 
+var ingredientsArray;   //all of the ingredients, sorted & w/o duplicates 
+var recipesMongoObject; //all of the recipes from the DB, as a Mongo object (contains a lot of unnecessary info) 
+var allRecipesArray;    //all of the recipes w/o extra Mongo fields  
+
+//this is populated when the user clicks generate 
 var generatedRecipes; //only the recipes that match the user-entered ingredients
-var allRecipesArray;
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
@@ -48,6 +51,7 @@ console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
 
 // This will first attempt to connect to DB
 // Server eventually crashes if DB connection takes too long / does not work 
+// This will populate all of the necessary info (such as recipes and ingredients) if DB connection succeeds 
 MongoClient.connect(mongoURL, function (err, client) {
     if(err) throw err;
 
@@ -58,48 +62,42 @@ MongoClient.connect(mongoURL, function (err, client) {
     app.listen(port, function () {
         console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
     });
-});
 
-//When user first loads the page this will create arrays of the recipes and ingredient 
-app.use("*", function (req, res, next) {
+    recipesMongoObject = db.collection('recipes');
 
-    //If the truthiness of these variables is false, it means we have not initialized them
-    //This should only occur on the first use of the page 
-    if(!ingredientsArray || !recipesMongoObject || allRecipesArray){
-        recipesMongoObject = db.collection('recipes');
+    var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
 
-        var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
+    ingredientsArray = []; 
+    
+    recipesCursor.toArray(function(err, allRecipes){
+        if(err){
+            res.status(500).send("Error fetching from DB");
+        }
+        else{ //create array of all recipes, sorted set (i.e. no duplicates) of all ingredients 
+                        
+            allRecipesArray = allRecipes; 
 
-        ingredientsArray = []; 
-        recipesCursor.toArray(function(err, allRecipes){
-            if(err){
-                res.status(500).send("Error fetching from DB");
-            }
-            else{ //create array of all recipes, sorted set (i.e. no duplicates) of all ingredients 
-                            
-                allRecipesArray = allRecipes; 
-
-                //make an array of ingredients 
-                allRecipesArray.forEach(function (element){
-                    element.ingredients.forEach(function (ingredient){
-                        ingredientsArray.push(ingredient);
-                    });
-
+            //make an array of ingredients 
+            allRecipesArray.forEach(function (element){
+                element.ingredients.forEach(function (ingredient){
+                    ingredientsArray.push(ingredient);
                 });
 
-                ingredientsArray.sort();
+            });
 
-                //remove duplicates
-                //probably not efficient
-                ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
-                        return index === arr.indexOf(elem);
-                });
+            ingredientsArray.sort();
+
+            //remove duplicates
+            //probably not efficient
+            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
+                    return index === arr.indexOf(elem);
+            });
 
 
-                console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
-                next();
-            }});
-    }
+            console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
+            
+        }});
+
 });
 
 //This is triggered when a user enters an ingredient on the main search bar
