@@ -8,14 +8,13 @@ Then, by clicking generate, they will be redirected to a new page which has up t
 
 Finally, clicking on a recipe tile on the generated recipes page takes the user to a third page which displays all of the details of the recipe (including attribution).
 
-:spaghetti: :pizza: :ramen:
-
-<br> 
-<br> 
-<br> 
 <br>
-<br>
-<br>
-<br>
+:spaghetti:       <br>
+:pizza:           <br>
+:ramen:           <br> 
+:fork_and_knife:  <br> 
+:sushi:           <br> 
+:bread:           <br> 
+:hamburger:       <br>
 [1] The closesness factor is determined by two things: the number of ingredients in the recipe which match what the user entered (1 point is added) and the number of extra ingredients in the recipe which the user did not enter (1 point is subtracted). 
 
