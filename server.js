@@ -44,18 +44,71 @@ var allRecipesArray;
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
+
+// *** Start of routing *** 
 console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
 
+// This will first attempt to connect to DB
+// Server eventually crashes if DB connection takes too long / does not work 
 MongoClient.connect(mongoURL, function (err, client) {
     if(err) throw err;
 
     db = client.db(mongoDBName);
 
+    //We only get to this point if there is no err
+    //Server will not start running w/o DB which is what we want 
     app.listen(port, function () {
         console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
     });
 });
 
+//need to load database before anything else happens
+app.use('/home.html', function (req, res, next) {
+    recipes = db.collection('recipes');
+
+    var recipesCursor = recipes.find({}).project({_id: 0});
+
+    recipesCursor.toArray(function(err, allRecipes){
+        if(err){
+            res.status(500).send("Error fetching from DB");
+        }else{
+            allRecipesArray = allRecipes;
+            //console.log("*** All recipes \n", allRecipesArray);
+        }});
+
+    var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
+
+    //Gets an array of all the ingredient names and stores it server side
+    //This is all very hacky right now
+    //I'm sure there is a better way to do it
+    ingredientCursor.toArray(function (err, recipeDocs) {
+        if(err){
+            res.status(500).send("Error fetching from DB");
+        } else {
+            var index = 0;
+            for(var i = 0; i < recipeDocs.length; i++){
+                for(var j = 0; j < recipeDocs[i].ingredients.length; j++){
+                    ingredientsArray[index] = (recipeDocs[i].ingredients)[j];
+                    index += 1;
+                }
+            }
+
+
+            ingredientsArray = ingredientsArray.sort();
+
+            //remove duplicates
+            //probably not efficient
+            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
+                    return index === arr.indexOf(elem);
+            });
+
+
+            console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
+            next();
+       }
+    });
+
+});
 
 //This is triggered when a user enters an ingredient on the main search bar
 app.get('/search/:ingredient', function (req, res, next){
@@ -170,53 +223,6 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
     // res.status(200).send();
 });
 
-//need to load database before anything else happens
-app.use('/home.html', function (req, res, next) {
-    recipes = db.collection('recipes');
-
-    var recipesCursor = recipes.find({}).project({_id: 0});
-
-    recipesCursor.toArray(function(err, allRecipes){
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        }else{
-            allRecipesArray = allRecipes;
-            //console.log("*** All recipes \n", allRecipesArray);
-        }});
-
-    var ingredientCursor = recipes.find({}).project({'ingredients': 1, _id: 0});
-
-    //Gets an array of all the ingredient names and stores it server side
-    //This is all very hacky right now
-    //I'm sure there is a better way to do it
-    ingredientCursor.toArray(function (err, recipeDocs) {
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        } else {
-            var index = 0;
-            for(var i = 0; i < recipeDocs.length; i++){
-                for(var j = 0; j < recipeDocs[i].ingredients.length; j++){
-                    ingredientsArray[index] = (recipeDocs[i].ingredients)[j];
-                    index += 1;
-                }
-            }
-
-
-            ingredientsArray = ingredientsArray.sort();
-
-            //remove duplicates
-            //probably not efficient
-            ingredientsArray = ingredientsArray.filter(function(elem, index, arr) {
-                    return index === arr.indexOf(elem);
-            });
-
-
-            console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
-            next();
-       }
-    });
-
-});
 
 app.use(express.static('public'));
 
