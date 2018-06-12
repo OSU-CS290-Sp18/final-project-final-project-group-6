@@ -1,6 +1,7 @@
 html {
   height: 100%;
   width: 100%;
+  display: table;
 }
 
 body {
@@ -153,8 +154,9 @@ In particular: have a unified color scheme and fonts
  */
 
 .recipe-box {
-  width: 70%;
-  margin-left: 15%;
+  width: 60%;
+  margin-left: 20%;
+  margin-bottom: 20px;
   display: flex;
   padding: 5px;
   align-items: center;
@@ -165,25 +167,19 @@ In particular: have a unified color scheme and fonts
 }
 
 .recipe-title {
+  font-family: 'Lilita One', cursive;
+  font-weight: normal;
   font-size: 40px;
   margin: 4px;
 }
 
 .recipe-detail-contents {
   align-self: stretch;
-  align-items: flex-start;
+  align-items: center;
   display: flex;
   justify-content: space-evenly;
   flex-direction: row;
 }
-
-/*.time-and-image {
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-}*/
 
 .prep-time {
   font-size: 25px;
@@ -240,7 +236,6 @@ In particular: have a unified color scheme and fonts
   margin: 0px;
   width: 40vw;
 }
-
 
 /****** Generated Recipes Page *********************/
 .navbar {
