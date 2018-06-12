@@ -1,4 +1,8 @@
 *.log
 *.swp
 node_modules
+<<<<<<< HEAD
 views/partials
+=======
+public/partials.js
+>>>>>>> fbbdce4f90360dcb7fe021a2707382f953a42f82

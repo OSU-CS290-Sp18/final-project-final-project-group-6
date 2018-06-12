@@ -1,6 +1,7 @@
 html {
   height: 100%;
   width: 100%;
+  display: table;
 }
 
 body {
@@ -153,8 +154,9 @@ In particular: have a unified color scheme and fonts
  */
 
 .recipe-box {
-  width: 70%;
-  margin-left: 15%;
+  width: 60%;
+  margin-left: 20%;
+  margin-bottom: 20px;
   display: flex;
   padding: 5px;
   align-items: center;
@@ -165,12 +167,15 @@ In particular: have a unified color scheme and fonts
 }
 
 .recipe-title {
+  font-family: 'Lilita One', cursive;
+  font-weight: normal;
   font-size: 40px;
   margin: 4px;
 }
 
-.recipe-ingredients-content {
+.recipe-detail-contents {
   align-self: stretch;
+  align-items: center;
   display: flex;
   justify-content: space-evenly;
   flex-direction: row;
@@ -181,33 +186,43 @@ In particular: have a unified color scheme and fonts
 }
 
 .specific-recipe-attribution {
-  align-self: flex-start;
+  align-self: flex-end;
+}
+
+.ingreds-and-time {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  margin: 10px;
 }
 
 .ingredients {
-  margin: 10px;
   border-radius: 5px;
   background-color: white;
   border: 4px solid #793345;
-  padding: 5px;
+  padding: 10px;
+  white-space: nowrap;
 }
 
-.recipe-steps-content {
+.directions {
   margin: 10px;
   border-radius: 5px;
   background-color: white;
   border: 4px solid #793345;
-  padding: 5px;
+  padding: 10px;
 }
 
 .prep-time {
-  margin: 10px;
+  margin: 20px 0 0 0;
   text-align: center;
+
 
   border-radius: 5px;
   background-color: #F7D76C;
   border: 4px solid #793345;
-  padding: 5px;
+  padding: 10px;
 
   font-weight: normal;
   font-family: 'Lilita One', cursive;
@@ -216,6 +231,11 @@ In particular: have a unified color scheme and fonts
   color: #793345;
 }
 
+.recipe-details-img img {
+  border: 1px solid #793345;
+  margin: 0px;
+  width: 40vw;
+}
 
 /****** Generated Recipes Page *********************/
 .navbar {
