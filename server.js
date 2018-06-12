@@ -196,14 +196,12 @@ app.get('/genRecipe', function(req, res, next){
   });
 });
 
-//This should render the recipe Details page
-//Monica you should route to this page from yours
-//You can do this either by sending a GET request from within your JS
-//Or you can make every recipe a link to /recipeDetails/<name> with its corresponding name
-//Max you should set the inside of this function to render your page
-//recipeObject will contain a JavaScript object which can be used to render a page
-//(see Monica's example of that in the above middleware)
+//This will render the recipe details page
+//Can either route here by clicking on a recipe tile on the genRecipe page
+//Or by directly entering the URL
 app.get('/recipeDetails/:recipeName', function(req, res, next){
+
+    var found = 0; 
 
     allRecipesArray.find(function(recipeObject) {
         if(recipeObject.name == req.params.recipeName) {
@@ -217,10 +215,13 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
                 link: recipeObject.link,
                 courtesyOf: recipeObject.courtesyOf
             });
+
+           found = 1;  
         }
 
     });
-    // res.status(200).send();
+     
+    if(!found) next(); 
 });
 
 
