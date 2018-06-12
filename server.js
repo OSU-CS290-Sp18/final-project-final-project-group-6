@@ -109,29 +109,13 @@ app.get('/search/:ingredient', function (req, res, next){
     }
 });
 
-//Get request that is created when user clicks generate button on the main page
-app.get('/recipesWith/:ingredients', function (req, res, next){
-
-    //Turn the parameter string into an array of the ingredient names
-    var ingredients = req.params.ingredients.split(',');
-    console.log("\n===Searching for recipes with ingredient names:\n", ingredients, "\n===");
-
-    //Searches database to find any recipe that contains one or more of the ingredients entered by the user
-    var recipeCursor = recipesMongoObject.find({"ingredients": {$in: ingredients}}).project({_id: 0});
-
-    //namesCursor is a database object, this attempts to turn it into an array
-    recipeCursor.toArray(function (err, recipes) {
-        if(err){
-            res.status(500).send("Error fetching from DB");
-        } else {
-
-
-            generatedRecipes = [];
-            var recipeScores = [];
+//really this should be in a separate module
+function scoreRecipes(recipeScores, ingredients){
+            //var recipeScores = [];
 
             //This is quick and dirty
             //Needs to be cleaned up and refactored
-            recipes.forEach(function (element) {
+            allRecipesArray.forEach(function (element) {
                 var score = 0;
 
                 element.ingredients.forEach(function (ingredient){
@@ -153,6 +137,30 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
             });
 
             console.log("\n=== scored recipes as follows:\n", recipeScores, "\n===");
+}
+
+//Get request that is created when user clicks generate button on the main page
+app.get('/recipesWith/:ingredients', function (req, res, next){
+
+    //Turn the parameter string into an array of the ingredient names
+    var ingredients = req.params.ingredients.split(',');
+    console.log("\n===Searching for recipes with ingredient names:\n", ingredients, "\n===");
+
+    //Searches database to find any recipe that contains one or more of the ingredients entered by the user
+    var recipeCursor = recipesMongoObject.find({"ingredients": {$in: ingredients}}).project({_id: 0});
+
+    //namesCursor is a database object, this attempts to turn it into an array
+    recipeCursor.toArray(function (err, recipes) {
+        if(err){
+            res.status(500).send("Error fetching from DB");
+        } else {
+
+
+            generatedRecipes = [];
+
+            var recipeScores = [];
+            scoreRecipes(recipeScores, ingredients); 
+
             for(var i = 0; i < recipeScores.length && i < 10 ; i++){
                 generatedRecipes[i] = recipeScores[i].recipe;
             }
