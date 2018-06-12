@@ -3,6 +3,13 @@ var searchInput = document.getElementsByClassName("search-input")[0];
 var genButton = document.getElementById("generate-recipes-button");
 var ingredientNames = document.getElementsByClassName("ingredient-name");
 
+function setFocus()
+{
+	console.log("focused");
+	document.getElementById("navbar-search-input").focus();
+}
+
+
 //sends user search query to database, adds to ingredients-container if successful
 function searchAddIngredient(){
   var query = searchInput.value;
