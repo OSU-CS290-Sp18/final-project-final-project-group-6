@@ -1,9 +1,18 @@
-/*
-Server code for recipeFinder
-To use: set environment variables with the names below
-
-Author: Alex Grejuc
-*/
+/******************************************************************************
+** 
+** Server code for recipeFinder
+** 
+**          ** Must be on OSU VPN or OSU network to access MongoDB database **
+**
+**
+** To use: 
+**          set environment variables with the names below 
+**          run "npm install" to install necessary modules
+**          run "npm start" to run normally (also compiles handlebars)
+**          run "npm run dev" to run with nodemon (also compiles handlebars) 
+**
+**       
+******************************************************************************/
 
 //Ensure these dependencies are all installed in node_modules
 //These can be installed by running npm install (assuming you have the package.json from this repo)
@@ -36,6 +45,17 @@ app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
 console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
+
+MongoClient.connect(mongoURL, function (err, client) {
+    if(err) throw err;
+
+    db = client.db(mongoDBName);
+
+    app.listen(port, function () {
+        console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
+    });
+});
+
 
 //This is triggered when a user enters an ingredient on the main search bar
 app.get('/search/:ingredient', function (req, res, next){
@@ -199,16 +219,6 @@ app.use('/home.html', function (req, res, next) {
 });
 
 app.use(express.static('public'));
-
-MongoClient.connect(mongoURL, function (err, client) {
-    if(err) throw err;
-
-    db = client.db(mongoDBName);
-
-    app.listen(port, function () {
-        console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
-    });
-});
 
 //It would be nice to have an appropriately-styled 404 page, but it's not necessary
 app.get('*', function (req, res) {
