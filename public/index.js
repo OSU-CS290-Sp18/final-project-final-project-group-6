@@ -27,12 +27,19 @@ function searchAddIngredient(){
     console.log(request.status);
     if(request.status === 200) 
 	{
-		document.getElementById("nf-text").style.visibility = "hidden";
 		addIngredient(query); //add ingredient to container if successful search
 	}
 	else
 	{
-		document.getElementById("nf-text").style.visibility = "visible";
+		document.getElementById("main-search").style.border = "8px solid red";
+		document.getElementsByClassName("search-input")[0].placeholder = "Entered unknown ingredient. Please try again.";
+		
+		// revert back to normal on entered text
+		document.getElementsByClassName("search-input")[0].addEventListener("input", function()
+		{
+			document.getElementById("main-search").style.border = "8px solid #793345";
+			document.getElementsByClassName("search-input")[0].placeholder = "add an ingredient...";
+		});
 	}
   };
 }
