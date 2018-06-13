@@ -25,7 +25,15 @@ function searchAddIngredient(){
 
   request.onload = function (){
     console.log(request.status);
-    if(request.status === 200) addIngredient(query); //add ingredient to container if successful search
+    if(request.status === 200) 
+	{
+		document.getElementById("nf-text").style.visibility = "hidden";
+		addIngredient(query); //add ingredient to container if successful search
+	}
+	else
+	{
+		document.getElementById("nf-text").style.visibility = "visible";
+	}
   };
 }
 
