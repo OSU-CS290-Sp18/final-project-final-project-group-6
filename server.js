@@ -1,17 +1,17 @@
 /******************************************************************************
-** 
+**
 ** Server code for recipeFinder
-** 
+**
 **          ** Must be on OSU VPN or OSU network to access MongoDB database **
 **
 **
-** To use: 
-**          set environment variables with the names below 
+** To use:
+**          set environment variables with the names below
 **          run "npm install" to install necessary modules
 **          run "npm start" to run normally (also compiles handlebars)
-**          run "npm run dev" to run with nodemon (also compiles handlebars) 
+**          run "npm run dev" to run with nodemon (also compiles handlebars)
 **
-**       
+**
 ******************************************************************************/
 
 //Ensure these dependencies are all installed in node_modules
@@ -36,12 +36,12 @@ var db; //the database
 var app = express();
 var port = process.env.PORT || 3000; //use environment variable if set
 
-//These are populated on when the server is first started 
-var ingredientsArray;   //all of the ingredients, sorted & w/o duplicates 
-var recipesMongoObject; //all of the recipes from the DB, as a Mongo object (contains a lot of unnecessary info) 
-var allRecipesArray;    //all of the recipes w/o extra Mongo fields  
+//These are populated on when the server is first started
+var ingredientsArray;   //all of the ingredients, sorted & w/o duplicates
+var recipesMongoObject; //all of the recipes from the DB, as a Mongo object (contains a lot of unnecessary info)
+var allRecipesArray;    //all of the recipes w/o extra Mongo fields
 
-//this is populated when the user clicks generate 
+//this is populated when the user clicks generate
 var generatedRecipes; //only the recipes that match the user-entered ingredients
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
@@ -50,15 +50,15 @@ app.set('view engine', 'handlebars');
 console.log("\n=== Attempting to connect to DB: ", mongoURL, "===");
 
 // This will first attempt to connect to DB
-// Server eventually crashes if DB connection takes too long / does not work 
-// This will populate all of the necessary info (such as recipes and ingredients) if DB connection succeeds 
+// Server eventually crashes if DB connection takes too long / does not work
+// This will populate all of the necessary info (such as recipes and ingredients) if DB connection succeeds
 MongoClient.connect(mongoURL, function (err, client) {
     if(err) throw err;
 
     db = client.db(mongoDBName);
 
     //We only get to this point if there is no err
-    //Server will not start running w/o DB which is what we want 
+    //Server will not start running w/o DB which is what we want
     app.listen(port, function () {
         console.log("\n=== Server listening on port ", port, " (successfully connected to DB)", "===");
     });
@@ -67,17 +67,17 @@ MongoClient.connect(mongoURL, function (err, client) {
 
     var recipesCursor = recipesMongoObject.find({}).project({_id: 0});
 
-    ingredientsArray = []; 
-    
+    ingredientsArray = [];
+
     recipesCursor.toArray(function(err, allRecipes){
         if(err){
             res.status(500).send("Error fetching from DB");
         }
-        else{ //create array of all recipes, sorted set (i.e. no duplicates) of all ingredients 
-                        
-            allRecipesArray = allRecipes; 
+        else{ //create array of all recipes, sorted set (i.e. no duplicates) of all ingredients
 
-            //make an array of ingredients 
+            allRecipesArray = allRecipes;
+
+            //make an array of ingredients
             allRecipesArray.forEach(function (element){
                 element.ingredients.forEach(function (ingredient){
                     ingredientsArray.push(ingredient);
@@ -95,7 +95,7 @@ MongoClient.connect(mongoURL, function (err, client) {
 
 
             console.log("\n=== Server got the following ingredients list from the DB:\n", ingredientsArray, "\n===");
-            
+
         }});
 
 });
@@ -161,8 +161,8 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
             generatedRecipes = [];
 
             var recipeScores = [];
-            
-            scoreRecipes(recipeScores, ingredients, validRecipes); 
+
+            scoreRecipes(recipeScores, ingredients, validRecipes);
 
             for(var i = 0; i < recipeScores.length && i < 12 ; i++){
                 generatedRecipes[i] = recipeScores[i].recipe;
@@ -180,7 +180,7 @@ app.get('/recipesWith/:ingredients', function (req, res, next){
 //Routed via the javascript in index.js following a 200 response from the server
 app.get('/genRecipe', function(req, res, next){
 
-    //prevents undefined behavior if a user tries to bypass recipe generation to get to this page 
+    //prevents undefined behavior if a user tries to bypass recipe generation to get to this page
     if(generatedRecipes){
         //This is just for printing to the console
         var names = "";
@@ -204,7 +204,7 @@ app.get('/genRecipe', function(req, res, next){
 //Or by directly entering the URL
 app.get('/recipeDetails/:recipeName', function(req, res, next){
 
-    var found = 0; 
+    var found = 0;
 
     allRecipesArray.find(function(recipeObject) {
         if(recipeObject.name == req.params.recipeName) {
@@ -220,12 +220,12 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
                 genRecipeJS: false
             });
 
-           found = 1;  
+           found = 1;
         }
 
     });
-     
-    if(!found) next(); 
+
+    if(!found) next();
 });
 
 
@@ -233,6 +233,5 @@ app.use(express.static('public'));
 
 //It would be nice to have an appropriately-styled 404 page, but it's not necessary
 app.get('*', function (req, res) {
-        res.status(404);
-        res.send("The page you requested doesn't exist");
+        res.status(404).render('404');
 });
