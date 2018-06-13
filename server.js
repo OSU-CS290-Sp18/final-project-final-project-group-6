@@ -192,7 +192,8 @@ app.get('/genRecipe', function(req, res, next){
 
         console.log("\n=== Server generating genRecipe page with the following recipes:\n", names, "\n===");
         res.status(200).render('genRecipe', {
-            recipes: generatedRecipes
+            recipes: generatedRecipes,
+            genRecipeJS: true
         });
     }
     else next();
@@ -215,7 +216,8 @@ app.get('/recipeDetails/:recipeName', function(req, res, next){
                 time: recipeObject.time,
                 directions: recipeObject.directions,
                 link: recipeObject.link,
-                courtesyOf: recipeObject.courtesyOf
+                courtesyOf: recipeObject.courtesyOf,
+                genRecipeJS: false
             });
 
            found = 1;  

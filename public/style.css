@@ -1,3 +1,4 @@
+
 html {
   height: 100%;
   width: 100%;
@@ -178,6 +179,9 @@ In particular: have a unified color scheme and fonts
   color: #793345;
 }
 
+#generate-recipes-button:hover{
+    cursor:pointer;
+}
 
 /*
  *  Here down is for individual recipe page
@@ -339,6 +343,7 @@ In particular: have a unified color scheme and fonts
   justify-content: center;
 }
 
+
 .recipe {
   display: flex;
   border: 4px solid #793345;
@@ -354,6 +359,10 @@ In particular: have a unified color scheme and fonts
   border: 1px solid #793345;
   margin: 0px;
   height: 100px;
+}
+
+.recipe-text:hover{
+    cursor: pointer;
 }
 
 .recipe-text {

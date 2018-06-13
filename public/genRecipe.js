@@ -38,9 +38,11 @@ function renderDetails(event){
   }
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-  var recipeContainer = document.getElementsByClassName('recipe-text');
-  for(var i = 0; i < recipeContainer.length; i++) {
-    recipeContainer[i].addEventListener('click', renderDetails);
-  }
+var recipeContainer = document.getElementsByClassName('recipe-container')[0];
+
+recipeContainer.addEventListener('click', function(event) {
+    if(event.target.classList.contains("recipe-text")) {
+        console.log("clicked");
+        renderDetails(event);
+    }
 });

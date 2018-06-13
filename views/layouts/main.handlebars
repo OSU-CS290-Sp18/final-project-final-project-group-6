@@ -15,12 +15,13 @@
 
     <script src="/recipeTemplate.js" charset="utf-8" defer></script>
 
-    <script src="/genRecipe.js" charset="utf-8" defer></script>
-
+    {{#if genRecipeJS}}
+      <script src="/genRecipe.js" charset="utf-8" defer></script>
+    {{/if}}
   </head>
 
   <body>
-    <img id="bg" src="/ingredientBackground.jpg">
+    <!--img id="bg" src="/ingredientBackground.jpg"-->
 
     {{{body}}}
 
