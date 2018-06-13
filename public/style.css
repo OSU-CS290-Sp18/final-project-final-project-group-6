@@ -115,12 +115,6 @@ In particular: have a unified color scheme and fonts
   font-family: basic;
 }
 
-#nf-text{
-	visibility: hidden;
-	text-align: center;
-	color: red;
-	margin-bottom: -20px;
-}
 
 /*********************************************/
 
